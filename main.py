@@ -1,4 +1,4 @@
-import machine
+from machine import PIN,I2C,SPI,RTC
 import ssd1306
 import dht
 import sgp30
@@ -174,17 +174,17 @@ def main():
     assert wlan.active()
     #wlan.scan()
     
-    spi = machine.SPI(1, baudrate=8000000, polarity=0, phase=0)
-    oled = ssd1306.SSD1306_SPI(128, 64, spi, machine.Pin(DC), machine.Pin(RES),
-                               machine.Pin(CS))
+    spi = SPI(1, baudrate=8000000, polarity=0, phase=0)
+    oled = ssd1306.SSD1306_SPI(128, 64, spi, Pin(DC), Pin(RES),
+                               Pin(CS))
 
     ntptime.NTP_DELTA = 3155644800
     ntptime.host = 'ntp1.aliyun.com'
-    rtc = machine.RTC()
+    rtc = RTC()
 
-    th = dht.DHT11(machine.Pin(DHT))
+    th = dht.DHT11(Pin(DHT))
     
-    i2c = machine.I2C(scl= machine.Pin(SCL),sda=machine.Pin(SDA),freq=100000)
+    i2c = I2C(scl= Pin(SCL),sda=Pin(SDA),freq=100000)
     sgp = sgp30.Adafruit_SGP30(i2c)
 
     logno = -1
@@ -226,7 +226,7 @@ def main():
             if connect_wifi(wlan):          
                 for i in range(3):
                     if sync_time():
-                        rtc = machine.RTC()
+                        rtc = RTC()
                         sync = 1
                         show_message(oled, 'Sync Success')
                         break
