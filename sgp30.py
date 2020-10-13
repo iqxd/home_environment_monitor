@@ -50,7 +50,7 @@ __repo__ = "https://github.com/alexmrqt/Adafruit_CircuitPython_SGP30.git"
 
 # pylint: disable=bad-whitespace
 _SGP30_DEFAULT_I2C_ADDR  = const(0x58)
-_SGP30_FEATURESET        = const(0x0020)
+_SGP30_FEATURESET        = const(0x0022)
 
 _SGP30_CRC8_POLYNOMIAL   = const(0x31)
 _SGP30_CRC8_INIT         = const(0xFF)
