@@ -175,16 +175,16 @@ def main():
     #wlan.scan()
     
     spi = SPI(1, baudrate=8000000, polarity=0, phase=0)
-    oled = ssd1306.SSD1306_SPI(128, 64, spi, Pin(DC), Pin(RES),
-                               Pin(CS))
+    oled = ssd1306.SSD1306_SPI(128, 64, spi, PIN(DC), PIN(RES),
+                               PIN(CS))
 
     ntptime.NTP_DELTA = 3155644800
     ntptime.host = 'ntp1.aliyun.com'
     rtc = RTC()
 
-    th = dht.DHT11(Pin(DHT))
+    th = dht.DHT11(PIN(DHT))
     
-    i2c = I2C(scl= Pin(SCL),sda=Pin(SDA),freq=100000)
+    i2c = I2C(scl= PIN(SCL),sda=PIN(SDA),freq=100000)
     sgp = sgp30.Adafruit_SGP30(i2c)
 
     logno = -1
