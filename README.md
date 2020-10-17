@@ -8,7 +8,7 @@ an air quality watcher based on esp8266 and micropython
 4. SGP30, CO2 and TVOC Sensor
 
 ### Connection
-| D1 Mini Label | ESP8266 GPIO | SSD1306 | DHT11 | SGP30 |
+| D1 Mini Pin | ESP8266 Pin | SSD1306 | DHT11 | SGP30 |
 | ----|   ----    |----|----|----| 
 | D0  | GPIO16    |    |    |    | 
 | D1  | GPIO5     |    |    |SCL | 
