@@ -7,7 +7,7 @@ an air quality watcher based on esp8266 and micropython
 3. DHT11, Temperature and Humidity Sensor 
 4. SGP30, CO2 and TVOC Sensor
 
-## Connection
+### Connection
 | D1 Mini Label | ESP8266 GPIO | SSD1306 | DHT11 | SGP30 |
 | ----|   ----    |----|----|----| 
 | D0  | GPIO16    |    |    |    | 
@@ -27,3 +27,6 @@ an air quality watcher based on esp8266 and micropython
 | 3V3 | 3.3V      |VCC | +  |VCC | 
 | RST | RST       |    |    |    | 
 
+
+## Firmware
+MicroPython v1.13 on 2020-09-11; ESP module with ESP8266
