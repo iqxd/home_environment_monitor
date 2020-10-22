@@ -1,7 +1,6 @@
 from display import Display
 from machine import Pin, I2C, RTC
-import ssd1306
-import dht
+from temphumi import TempHumi
 import sgp30
 import network
 import os
@@ -128,7 +127,7 @@ def main():
     ntptime.host = 'ntp1.aliyun.com'
     rtc = RTC()
 
-    th = dht.DHT11(Pin(DHT))
+    th = TempHumi(Pin(DHT))
 
     i2c = I2C(scl=Pin(SCL), sda=Pin(SDA), freq=100000)
     sgp = sgp30.Adafruit_SGP30(i2c)
@@ -203,9 +202,7 @@ def main():
             write_synclog(datetimestr, sync)
 
         # measure temperature and humidity
-        th.measure()
-        temperature = th.temperature()
-        humidity = th.humidity()
+        temperature, humidity = th.measure()
         thirdline = "T %2d.C  H %2d%%" % (temperature, humidity)
 
         co2eq, tvoc = sgp.iaq_measure()
