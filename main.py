@@ -121,7 +121,7 @@ def main():
     assert wlan.active()
     #wlan.scan()
 
-    display = Display(Pin(DC), Pin(RES), Pin(CS), W, H, B)
+    disp = Display(Pin(DC), Pin(RES), Pin(CS), W, H, B)
 
     ntptime.NTP_DELTA = 3155644800
     ntptime.host = 'ntp1.aliyun.com'
@@ -163,25 +163,25 @@ def main():
     synccount = 0
     logcount = 1  # not log at start time ; 0 if log data at start time
 
-    display.show_progress('Start', 3)
+    disp.show_progress('Start', 3)
     while True:
         sync = 0
         if synccount % SYNC_SECS == 0:
-            display.show_progress('Sync Time', 1)
+            disp.show_progress('Sync Time', 1)
             if connect_wifi(wlan):
                 for i in range(3):
                     if sync_time():
                         rtc = RTC()
                         sync = 1
-                        display.show_text('Sync Success')
+                        disp.show_text('Sync Success')
                         break
                     time.sleep(1)
                 else:
                     sync = -2
-                    display.show_text('Sync Fail')
+                    disp.show_text('Sync Fail')
             else:
                 sync = -1
-                display.show_text('Connect Fail')
+                disp.show_text('Connect Fail')
             time.sleep_ms(500)
             synccount = 0
         synccount += 1
@@ -216,13 +216,13 @@ def main():
             boarder_state = False  # boarder off
         blinkcount += 1
 
-        display.show_text(
+        disp.show_text(
             [firstline, secondline, thirdline, forthline, fifthline],
             boarder_state)
 
         if logcount % LOG_SECS == 0:
             logno += 1
-            display.show_progress('Write Log', 1)
+            disp.show_progress('Write Log', 1)
             write_datalog(logno, datetimestr, temperature, humidity, co2eq,
                           tvoc)
             logcount = 0
