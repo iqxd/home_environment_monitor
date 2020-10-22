@@ -1,5 +1,5 @@
-# AirQualityWatcher
-an air quality watcher based on esp8266 and micropython
+# Home Environment Monitor
+IOT home environment monitor based on esp8266 and micropython
 
 ## Hardware
 1. D1 Mini board with esp8266 chip
