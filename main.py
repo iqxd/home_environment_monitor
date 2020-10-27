@@ -1,7 +1,7 @@
 from display import Display
-from machine import Pin, I2C, RTC
+from machine import Pin, RTC
 from temphumi import TempHumi
-import sgp30
+from co2tvoc import CO2TVOC
 import network
 import os
 import time
@@ -129,8 +129,7 @@ def main():
 
     th = TempHumi(Pin(DHT))
 
-    i2c = I2C(scl=Pin(SCL), sda=Pin(SDA), freq=100000)
-    sgp = sgp30.Adafruit_SGP30(i2c)
+    sgp = CO2TVOC(Pin(SCL), Pin(SDA))
 
     logno = -1
 
@@ -205,7 +204,7 @@ def main():
         temperature, humidity = th.measure()
         thirdline = "T %2d.C  H %2d%%" % (temperature, humidity)
 
-        co2eq, tvoc = sgp.iaq_measure()
+        co2eq, tvoc = sgp.measure()
         forthline = "CO2 %3d ppm" % co2eq
         fifthline = "TVO %3d ppb" % tvoc
 
