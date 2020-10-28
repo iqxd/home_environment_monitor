@@ -1,3 +1,4 @@
+import time
 from machine import Pin
 from wireless import Wireless
 from datetime import DateTime
@@ -5,9 +6,6 @@ from display import Display
 from temphumi import TempHumi
 from co2tvoc import CO2TVOC
 from logger import Logger
-import os
-import time
-import gc
 
 # constants
 W = 128
@@ -36,7 +34,7 @@ def main():
     disp.show_progress('Start', 3)
     th = TempHumi(Pin(DHT))
     sgp = CO2TVOC(Pin(SCL), Pin(SDA))
-    wireless = Wireless(WIFI_NAME,WIFI_PASSWORD)
+    wireless = Wireless(WIFI_NAME, WIFI_PASSWORD)
     datetime = DateTime(wireless)
     logger = Logger(LOG_FILENAME)
 
@@ -61,7 +59,7 @@ def main():
             synccount = 0
         synccount += 1
 
-        firstline,secondline,datetimestr = datetime.get_formatted()
+        firstline, secondline, datetimestr = datetime.get_formatted()
 
         if logno == -1:
             # write start message
@@ -93,8 +91,8 @@ def main():
         if logcount % LOG_SECS == 0:
             logno += 1
             disp.show_progress('Write Log', 1)
-            logger.write_datalog(logno, datetimestr, temperature, humidity, co2eq,
-                          tvoc)
+            logger.write_datalog(logno, datetimestr, temperature, humidity,
+                                 co2eq, tvoc)
             logcount = 0
         logcount += 1
 

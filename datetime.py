@@ -1,6 +1,4 @@
 import machine
-import time
-import network
 import ntptime
 
 ntptime.NTP_DELTA = 3155644800

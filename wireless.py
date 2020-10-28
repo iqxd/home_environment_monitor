@@ -3,8 +3,8 @@ import time
 
 
 class Wireless:
-    def __init__(self,wifiname,password):
-        self._wlan =self._activate()
+    def __init__(self, wifiname, password):
+        self._wlan = self._activate()
         self._wifiname = wifiname
         self._password = password
 
@@ -18,7 +18,7 @@ class Wireless:
         return wlan
 
     def connect(self):
-        self._wlan.connect(self._wifiname,self._password)
+        self._wlan.connect(self._wifiname, self._password)
         for i in range(15):
             if self._wlan.isconnected():
                 return True
@@ -28,4 +28,3 @@ class Wireless:
 
     def isconnected(self):
         return self._wlan.isconnected()
-

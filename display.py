@@ -66,5 +66,3 @@ class Display:
             self._screen.fill_rect(x + i * bw, y, bw, 8, 1)
             self._screen.show()
             time.sleep_ms(duration_ms)
-
-
