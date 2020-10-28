@@ -1,11 +1,11 @@
+from wireless import Wireless
+from datetime import DateTime
 from display import Display
-from machine import Pin, RTC
+from machine import Pin
 from temphumi import TempHumi
 from co2tvoc import CO2TVOC
-import network
 import os
 import time
-import ntptime
 import gc
 
 # constants
@@ -28,27 +28,6 @@ CS = 15  # D8
 DHT = 12  # D6
 SCL = 5  # D1
 SDA = 4  # D2
-
-
-def connect_wifi(wlan, init=False):
-    wlan.connect(WIFI_NAME, WIFI_PASSWORD)
-    if wlan.isconnected():
-        return True
-    for i in range(15):
-        if wlan.isconnected():
-            return True
-        time.sleep(1)
-    else:
-        return False
-
-
-def sync_time():
-    try:
-        ntptime.settime()
-    except:
-        return False
-    else:
-        return True
 
 
 def write_startlog(start_message):
@@ -113,84 +92,37 @@ def read_datalog():
 
 
 def main():
-    ap = network.WLAN(network.AP_IF)
-    if ap.active():
-        ap.active(False)
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    assert wlan.active()
-    #wlan.scan()
-
     disp = Display(Pin(DC), Pin(RES), Pin(CS), W, H, B)
-
-    ntptime.NTP_DELTA = 3155644800
-    ntptime.host = 'ntp1.aliyun.com'
-    rtc = RTC()
-
+    disp.show_progress('Start', 3)
+    
+    wireless = Wireless(WIFI_NAME,WIFI_PASSWORD)
+    datetime = DateTime(wireless)
     th = TempHumi(Pin(DHT))
-
     sgp = CO2TVOC(Pin(SCL), Pin(SDA))
 
     logno = -1
-
-    weekdays = {
-        1: 'Mon',
-        2: 'Tus',
-        3: 'Wen',
-        4: 'Thu',
-        5: 'Fri',
-        6: 'Sat',
-        7: 'Sun'
-    }
-
-    months = {
-        1: 'Jan',
-        2: 'Feb',
-        3: 'Mar',
-        4: 'Apr',
-        5: 'May',
-        6: 'Jun',
-        7: 'Jul',
-        8: 'Aug',
-        9: 'Sep',
-        10: 'Oct',
-        11: 'Nov',
-        12: 'Dec'
-    }
 
     blinkcount = 0
     synccount = 0
     logcount = 1  # not log at start time ; 0 if log data at start time
 
-    disp.show_progress('Start', 3)
     while True:
         sync = 0
         if synccount % SYNC_SECS == 0:
             disp.show_progress('Sync Time', 1)
-            if connect_wifi(wlan):
-                for i in range(3):
-                    if sync_time():
-                        rtc = RTC()
-                        sync = 1
-                        disp.show_text('Sync Success')
-                        break
-                    time.sleep(1)
-                else:
-                    sync = -2
-                    disp.show_text('Sync Fail')
-            else:
-                sync = -1
+            sync = datetime.sync()
+            if sync == 1:
+                disp.show_text('Sync Success')
+            elif sync == -1:
                 disp.show_text('Connect Fail')
+            elif sync == -2:
+                disp.show_text('Sync Fail')
             time.sleep_ms(500)
             synccount = 0
         synccount += 1
 
-        year, month, day, weekday, hour, minute, second, _ = rtc.datetime()
-        firstline = "%s %02d %s %d" % (weekdays[weekday + 1], day,
-                                       months[month], year)
-        secondline = "%02d:%02d:%02d" % (hour, minute, second)
-        datetimestr = '%04d%02d%02d%02d%02d%02d' % (year, month, day, hour,
-                                                    minute, second)
+        firstline,secondline = datetime.get_formatted()
+        datetimestr = '%s %s' % (firstline,secondline)
 
         if logno == -1:
             # write start message
