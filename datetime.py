@@ -31,11 +31,12 @@ months = {
     12: 'Dec'
 }
 
+
 class DateTime:
-    def __init__(self,wl):
+    def __init__(self, wl):
         self._wl = wl
         self._rtc = machine.RTC()
-    
+
     def sync(self):
         if not self._wl.isconnected():
             if not self._wl.connect():
@@ -47,20 +48,24 @@ class DateTime:
             return -2
         else:
             return 1
-    
-    def get(self):
-        year, month, day, weekday, hour, minute, second, _ = self._rtc.datetime()
-        weekday +=1
-        return year,month,day,weekday,hour,minute,second
 
-    def get_formatted(self, show_week = True, show_secs = False):
-        year,month,day,weekday,hour,minute,second = self.get()
+    def get(self):
+        year, month, day, weekday, hour, minute, second, _ = self._rtc.datetime(
+        )
+        weekday += 1
+        return year, month, day, weekday, hour, minute, second
+
+    def get_formatted(self, show_week=True, show_secs=False):
+        year, month, day, weekday, hour, minute, second = self.get()
         if show_week:
-            fdate = "%s %02d-%s-%d" % (weekdays[weekday], day, months[month], year)
+            fdate = "%s %02d-%s-%d" % (weekdays[weekday], day, months[month],
+                                       year)
         else:
             fdate = "%02d-%s-%d" % (day, months[month], year)
         if show_secs:
             ftime = "%02d:%02d:%02d" % (hour, minute, second)
         else:
             ftime = "%02d:%02d" % (hour, minute)
-        return fdate, ftime
+        raw = '%04d%02d%02d%02d%02d%02d' % (year, month, day, hour, minute,
+                                            second)
+        return fdate, ftime, raw

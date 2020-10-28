@@ -1,9 +1,10 @@
+from machine import Pin
 from wireless import Wireless
 from datetime import DateTime
 from display import Display
-from machine import Pin
 from temphumi import TempHumi
 from co2tvoc import CO2TVOC
+from logger import Logger
 import os
 import time
 import gc
@@ -30,67 +31,6 @@ SCL = 5  # D1
 SDA = 4  # D2
 
 
-def write_startlog(start_message):
-    with open(LOG_FILENAME, 'a') as f:
-        f.write(start_message)
-
-
-def write_titlelog():
-    with open(LOG_FILENAME, 'a') as f:
-        f.write('%4s %14s %2s %2s %4s %4s\n' %
-                ('No.', 'Datetime', 'TC', 'H%', 'CO2', 'TVOC'))
-
-
-def check_reset_log():
-    try:
-        logsize = os.stat(LOG_FILENAME)[6]
-    except Exception:
-        logsize = 0
-    # print('logsize = %d' % logsize)
-    if logsize > LOG_MAXBYTES:
-        gc.collect()
-        try:
-            logs = read_datalog()
-        except MemoryError:
-            with open(LOG_FILENAME, 'w') as f:
-                f.write('===Memory Allocation Error===')
-            return
-        lines = logs.split('\n')
-        leftlines = lines[(len(lines) // 2):]
-        with open(LOG_FILENAME, 'w') as f:
-            f.write('\n'.join(leftlines))
-
-
-def write_datalog(logno, logtimestr, temp, humi, co2, tvoc):
-    #check_reset_log()
-    with open(LOG_FILENAME, 'a') as f:
-        if logno == 1:
-            f.write('%4s %14s %2s %2s %4s %3s\n' %
-                    ('No.', 'Datetime', 'TC', 'H%', 'CO2', 'TVOC'))
-        f.write('%4d %14s %2d %2d %4d %3d\n' %
-                (logno, logtimestr, temp, humi, co2, tvoc))
-
-
-def write_synclog(logtimestr, sync):
-    if sync > 0:
-        mark = '*'
-    elif sync == -1:
-        mark = 'x'
-    elif sync == -2:
-        mark = '-'
-    else:
-        mark = ' '
-    with open(LOG_FILENAME, 'a') as f:
-        f.write('%4s %14s\n' % (mark, logtimestr))
-
-
-def read_datalog():
-    with open(LOG_FILENAME, 'r') as f:
-        logs = f.read()
-        # print(logs)
-        return logs
-
-
 def main():
     disp = Display(Pin(DC), Pin(RES), Pin(CS), W, H, B)
     disp.show_progress('Start', 3)
@@ -98,6 +38,7 @@ def main():
     sgp = CO2TVOC(Pin(SCL), Pin(SDA))
     wireless = Wireless(WIFI_NAME,WIFI_PASSWORD)
     datetime = DateTime(wireless)
+    logger = Logger(LOG_FILENAME)
 
     logno = -1
 
@@ -120,16 +61,15 @@ def main():
             synccount = 0
         synccount += 1
 
-        firstline,secondline = datetime.get_formatted()
-        datetimestr = '%s %s' % (firstline,secondline)
+        firstline,secondline,datetimestr = datetime.get_formatted()
 
         if logno == -1:
             # write start message
-            write_startlog('\nSTART\n')
+            logger.write_startlog('\nSTART\n')
             logno = 0
 
         if sync != 0:
-            write_synclog(datetimestr, sync)
+            logger.write_synclog(datetimestr, sync)
 
         # measure temperature and humidity
         temperature, humidity = th.measure()
@@ -153,7 +93,7 @@ def main():
         if logcount % LOG_SECS == 0:
             logno += 1
             disp.show_progress('Write Log', 1)
-            write_datalog(logno, datetimestr, temperature, humidity, co2eq,
+            logger.write_datalog(logno, datetimestr, temperature, humidity, co2eq,
                           tvoc)
             logcount = 0
         logcount += 1
