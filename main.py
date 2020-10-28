@@ -94,11 +94,10 @@ def read_datalog():
 def main():
     disp = Display(Pin(DC), Pin(RES), Pin(CS), W, H, B)
     disp.show_progress('Start', 3)
-    
-    wireless = Wireless(WIFI_NAME,WIFI_PASSWORD)
-    datetime = DateTime(wireless)
     th = TempHumi(Pin(DHT))
     sgp = CO2TVOC(Pin(SCL), Pin(SDA))
+    wireless = Wireless(WIFI_NAME,WIFI_PASSWORD)
+    datetime = DateTime(wireless)
 
     logno = -1
 

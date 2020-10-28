@@ -7,7 +7,6 @@ class Wireless:
         self._wlan =self._activate()
         self._wifiname = wifiname
         self._password = password
-        self.connect()
 
     def _activate(self):
         ap = network.WLAN(network.AP_IF)
