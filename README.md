@@ -3,7 +3,7 @@ IOT home environment monitor based on esp8266 and micropython
 
 ## Hardware
 1. D1 Mini board with esp8266 chip
-2. SSD1306, 0.96 inch , 7 pin OLED Screen
+2. SSD1306, 0.96 inch 128x64 pixels, 7 pin OLED Screen
 3. DHT11, Temperature and Humidity Sensor 
 4. SGP30, CO2 and TVOC Sensor
 
