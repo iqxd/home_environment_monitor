@@ -1,5 +1,5 @@
+from machine import Pin, Timer
 import time
-from machine import Pin
 from wireless import Wireless
 from datetime import DateTime
 from display import Display
@@ -13,11 +13,10 @@ H = 64
 B = 2
 WIFI_NAME = 'wifiname'
 WIFI_PASSWORD = 'wifipassword'
-BLINK_SECS = 3
-SYNC_SECS = 1200  # 600
-LOG_SECS = 120  # 300 # 50k generated one day if log every 60 second
+DURATION_SECS = 2
+SYNC_DURATION_COUNT = 900 // DURATION_SECS  # measure per secs
+LOG_DURATION_COUNT = 240 // DURATION_SECS  # measure per secs
 LOG_FILENAME = 'timelog.txt'
-LOG_MAXBYTES = 1024 * 2
 
 # hardware GPIO Pins
 # D1 Mini Board
@@ -29,74 +28,74 @@ SCL = 5  # D1
 SDA = 4  # D2
 
 
-def main():
-    disp = Display(Pin(DC), Pin(RES), Pin(CS), W, H, B)
-    disp.show_progress('Start', 3)
-    th = TempHumi(Pin(DHT))
-    sgp = CO2TVOC(Pin(SCL), Pin(SDA))
-    wireless = Wireless(WIFI_NAME, WIFI_PASSWORD)
-    datetime = DateTime(wireless)
-    logger = Logger(LOG_FILENAME)
+class Station:
+    def __init__(self):
+        self.disp = Display(Pin(DC), Pin(RES), Pin(CS), W, H, B)
+        self.disp.show_progress('Start', 3)
+        self.th = TempHumi(Pin(DHT))
+        self.sgp = CO2TVOC(Pin(SCL), Pin(SDA))
+        self.wireless = Wireless(WIFI_NAME, WIFI_PASSWORD)
+        self.datetime = DateTime(self.wireless)
+        self.logger = Logger(LOG_FILENAME)
+        self.logger.write_startlog('\nSTART\n')
 
-    logno = -1
+        self._count = 0
+        self._boarder_state = True
 
-    blinkcount = 0
-    synccount = 0
-    logcount = 1  # not log at start time ; 0 if log data at start time
+    def measure(self):
+        need_sync = True if self._count % SYNC_DURATION_COUNT == 0 else False
+        need_log = True if self._count % LOG_DURATION_COUNT == 0 else False
 
-    while True:
-        sync = 0
-        if synccount % SYNC_SECS == 0:
-            disp.show_progress('Sync Time', 1)
-            sync = datetime.sync()
-            if sync == 1:
-                disp.show_text('Sync Success')
-            elif sync == -1:
-                disp.show_text('Connect Fail')
-            elif sync == -2:
-                disp.show_text('Sync Fail')
-            time.sleep_ms(500)
-            synccount = 0
-        synccount += 1
+        if need_sync:
+            self.disp.show_progress('Sync Time', 1)
+            sync_stat = self.datetime.sync()
+            if sync_stat == 1:
+                self.disp.show_text('Sync Success')
+            elif sync_stat == -1:
+                self.disp.show_text('Connect Fail')
+            elif sync_stat == -2:
+                self.disp.show_text('Sync Fail')
 
-        firstline, secondline, datetimestr = datetime.get_formatted()
+        firstline, secondline, datetimestr = self.datetime.get_formatted()
 
-        if logno == -1:
-            # write start message
-            logger.write_startlog('\nSTART\n')
-            logno = 0
+        if need_sync:
+            self.logger.write_synclog(datetimestr, sync_stat)
 
-        if sync != 0:
-            logger.write_synclog(datetimestr, sync)
+        temperature, humidity = self.th.measure()
+        co2eq, tvoc = self.sgp.measure()
 
-        # measure temperature and humidity
-        temperature, humidity = th.measure()
         thirdline = "T %2d.C  H %2d%%" % (temperature, humidity)
-
-        co2eq, tvoc = sgp.measure()
         forthline = "CO2 %3d ppm" % co2eq
         fifthline = "TVO %3d ppb" % tvoc
 
-        if blinkcount % BLINK_SECS == 0:
-            boarder_state = True  # boarder on
-            blinkcount = 0
-        else:
-            boarder_state = False  # boarder off
-        blinkcount += 1
+        self._boarder_state = not self._boarder_state
 
-        disp.show_text(
+        self.disp.show_text(
             [firstline, secondline, thirdline, forthline, fifthline],
-            boarder_state)
+            self._boarder_state)
 
-        if logcount % LOG_SECS == 0:
-            logno += 1
-            disp.show_progress('Write Log', 1)
-            logger.write_datalog(logno, datetimestr, temperature, humidity,
-                                 co2eq, tvoc)
-            logcount = 0
-        logcount += 1
+        if need_log:
+            self.disp.show_progress('Write Log', 1)
+            self.logger.write_datalog(datetimestr, temperature, humidity,
+                                      co2eq, tvoc)
 
-        time.sleep(1)
+        if self._count and need_sync and need_log:
+            self._count = 1
+        else:
+            self._count += 1
+
+    # print(self._count)
+
+    def measure_loop(self):
+        # tim = Timer(-1)
+        # try:
+        #     tim.init(mode = Timer.PERIODIC, period = 3000 , callback = lambda t : self.measure())
+        # except Exception:
+        #     tim.deinit()
+        while True:
+            self.measure()
+            time.sleep(DURATION_SECS)
 
 
-main()
+if __name__ == '__main__':
+    Station().measure_loop()
