@@ -46,20 +46,25 @@ class Station:
         need_sync = True if self._count % SYNC_DURATION_COUNT == 0 else False
         need_log = True if self._count % LOG_DURATION_COUNT == 0 else False
 
+        sync_stat = 0
+        mark = ''
         if need_sync:
             self.disp.show_progress('Sync Time', 1)
             sync_stat = self.datetime.sync()
             if sync_stat == 1:
                 self.disp.show_text('Sync Success')
+                mark = '*'
             elif sync_stat == -1:
                 self.disp.show_text('Connect Fail')
+                mark = 'x'
             elif sync_stat == -2:
                 self.disp.show_text('Sync Fail')
+                mark = '-'
 
         firstline, secondline, datetimestr = self.datetime.get_formatted()
 
         if need_sync:
-            self.logger.write_synclog(datetimestr, sync_stat)
+            self.logger.write_synclog(datetimestr, mark)
 
         temperature, humidity = self.th.measure()
         co2eq, tvoc = self.sgp.measure()

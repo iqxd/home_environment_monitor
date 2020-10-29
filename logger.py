@@ -18,14 +18,6 @@ class Logger:
                     (self._logno, logtimestr, temp, humi, co2, tvoc))
             self._logno += 1
 
-    def write_synclog(self, logtimestr, sync):
-        if sync > 0:
-            mark = '*'
-        elif sync == -1:
-            mark = 'x'
-        elif sync == -2:
-            mark = '-'
-        else:
-            mark = ' '
+    def write_synclog(self, logtimestr, sync_mark):
         with open(self._logfile, 'a') as f:
-            f.write('%4s %14s\n' % (mark, logtimestr))
+            f.write('%4s %14s\n' % (sync_mark, logtimestr))
