@@ -29,4 +29,4 @@ IOT home environment monitor based on esp8266 and micropython
 
 
 ## Firmware
-MicroPython v1.13 on 2020-09-11; ESP module with ESP8266
+MicroPython v1.13 2020-09-11; ESP module with ESP8266
