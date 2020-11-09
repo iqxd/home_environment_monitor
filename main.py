@@ -3,8 +3,7 @@ import time
 from wireless import Wireless
 from datetime import DateTime
 from display import Display
-from temphumi import TempHumi
-from co2tvoc import CO2TVOC
+from sensors import TempHumi,CO2TVOC
 from logger import Logger
 
 # constants
