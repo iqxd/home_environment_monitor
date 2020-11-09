@@ -3,8 +3,9 @@ import time
 from wireless import Wireless
 from datetime import DateTime
 from display import Display
-from sensors import TempHumi,CO2TVOC
+from sensors import TempHumi, CO2TVOC
 from logger import Logger
+from mqtt_pub import MQTT_CLI
 
 # constants
 W = 128
@@ -12,10 +13,13 @@ H = 64
 B = 2
 WIFI_NAME = 'wifiname'
 WIFI_PASSWORD = 'wifipassword'
+MQTT_SEVER_IP = '192.168.3.6'
+MQTT_CLIENT_NAME = 'pub_cli'
 DURATION_SECS = 2
 SYNC_DURATION_COUNT = 900 // DURATION_SECS  # measure per secs
-LOG_DURATION_COUNT = 240 // DURATION_SECS  # measure per secs
+LOG_DURATION_COUNT = 240 // DURATION_SECS  # write log per secs
 LOG_FILENAME = 'timelog.txt'
+PUB_DURATION_COUNT = 10 // DURATION_SECS  # mqtt pub data per secs
 
 # hardware GPIO Pins
 # D1 Mini Board
@@ -37,6 +41,7 @@ class Station:
         self.datetime = DateTime(self.wireless)
         self.logger = Logger(LOG_FILENAME)
         self.logger.write_startlog('\nSTART\n')
+        self.pubcli = MQTT_CLI(self.wireless, MQTT_CLIENT_NAME, MQTT_SEVER_IP)
 
         self._count = 0
         self._boarder_state = True
@@ -44,6 +49,7 @@ class Station:
     def measure(self):
         need_sync = True if self._count % SYNC_DURATION_COUNT == 0 else False
         need_log = True if self._count % LOG_DURATION_COUNT == 0 else False
+        need_pub = True if self._count % PUB_DURATION_COUNT == 0 else False
 
         sync_stat = 0
         mark = ''
@@ -83,7 +89,16 @@ class Station:
             self.logger.write_datalog(datetimestr, temperature, humidity,
                                       co2eq, tvoc)
 
-        if self._count and need_sync and need_log:
+        if need_pub:
+            self.pubcli.publish(
+                'measured',
+                dict(time=datetimestr,
+                     temp=temperature,
+                     humi=humidity,
+                     co2=co2eq,
+                     tvoc=tvoc))
+
+        if self._count and need_sync and need_log and need_pub:
             self._count = 1
         else:
             self._count += 1
