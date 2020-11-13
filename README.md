@@ -30,3 +30,16 @@ IOT home environment monitor based on esp8266 and micropython
 
 ## Firmware
 MicroPython v1.13 2020-09-11; ESP module with ESP8266
+
+## Communication
+MQTT Protocal with Broker Emqx
+
+## Upper Monitor Gui
+Dear PyGui 0.5.66 
+CPython 3.8
+
+## Prototype
+![avatar](https://user-images.githubusercontent.com/13008913/99083762-f3f97700-2600-11eb-96b4-054dbdca560f.jpg)
+
+## Realtime Monitor
+![avatar](https://user-images.githubusercontent.com/13008913/99083683-d5937b80-2600-11eb-8443-9e8a42945c07.PNG)
