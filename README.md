@@ -33,10 +33,13 @@ MicroPython v1.13 2020-09-11; ESP module with ESP8266
 
 ## Communication
 MQTT Protocal with Broker Emqx
+1. go to directory emqx\bin\ , open shell, run comand "emqx start"
+2. run command "emqx_ctl status" to check if node running
 
 ## Upper Monitor Gui
 Dear PyGui 0.5.66 
 CPython 3.8
+1. run "python monitor_gui\mqtt_sub_gui.py"
 
 ## Prototype
 ![avatar](https://user-images.githubusercontent.com/13008913/99083762-f3f97700-2600-11eb-96b4-054dbdca560f.jpg)
