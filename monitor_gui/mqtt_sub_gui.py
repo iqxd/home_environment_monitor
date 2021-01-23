@@ -36,22 +36,25 @@ def _render(sender, data):
     except queue.Empty:
         return
 
+    tcount_data = get_data('tcount')
     temp_data = get_data('temps')
     humi_data = get_data('humis')
     co2eq_data = get_data('co2eqs')
     tvoc_data = get_data('tvocs')
 
     if len(temp_data) > 100:
+        tcount_data[:] = tcount_data[50:] 
         temp_data[:] = temp_data[50:]
         humi_data[:] = humi_data[50:]
         co2eq_data[:] = co2eq_data[50:]
         tvoc_data[:] = tvoc_data[50:]
 
     t = time.time() - starttime
-    temp_data.append([t, tdata['temp']])
-    humi_data.append([t, tdata['humi']])
-    co2eq_data.append([t, tdata['co2']])
-    tvoc_data.append([t, tdata['tvoc']])
+    tcount_data.append(t)
+    temp_data.append(tdata['temp'])
+    humi_data.append(tdata['humi'])
+    co2eq_data.append(tdata['co2'])
+    tvoc_data.append(tdata['tvoc'])
     # print(temp_data,humi_data,co2eq_data,tvoc_data)
     log_info(tdata)
     clear_plot('plot_temp')
@@ -59,10 +62,10 @@ def _render(sender, data):
     clear_plot('plot_co2eq')
     clear_plot('plot_tvoc')
 
-    add_line_series('plot_temp', 'temp', temp_data, weight=2)
-    add_line_series('plot_humi', 'humi', humi_data, weight=2)
-    add_line_series('plot_co2eq', 'co2eq', co2eq_data, weight=2)
-    add_line_series('plot_tvoc', 'tvoc', tvoc_data, weight=2)
+    add_line_series('plot_temp', 'temp', tcount_data,temp_data, weight=2)
+    add_line_series('plot_humi', 'humi', tcount_data,humi_data, weight=2)
+    add_line_series('plot_co2eq', 'co2eq',tcount_data,co2eq_data, weight=2)
+    add_line_series('plot_tvoc', 'tvoc', tcount_data,tvoc_data, weight=2)
 
 
 show_logger()
@@ -87,6 +90,7 @@ with window('realtime plot'):
     set_plot_ylimits('plot_co2eq', 350, 800)
     set_plot_ylimits('plot_tvoc', -20, 200)
 
+    add_data('tcount', [])
     add_data('temps', [])
     add_data('humis', [])
     add_data('co2eqs', [])

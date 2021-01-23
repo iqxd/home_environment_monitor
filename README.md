@@ -37,7 +37,7 @@ MQTT Protocal with Broker Emqx
 2. run command "emqx_ctl status" to check if node running
 
 ## Upper Monitor Gui
-Dear PyGui 0.5.66 
+Dear PyGui 0.6.139
 CPython 3.8
 1. run "python monitor_gui\mqtt_sub_gui.py"
 
