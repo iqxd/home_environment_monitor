@@ -2,10 +2,10 @@
 IOT home environment monitor based on esp8266 and micropython
 
 ## Hardware
-1. D1 Mini board with esp8266 chip
-2. SSD1306, 0.96 inch 128x64 pixels, 7 pin OLED Screen
-3. DHT11, Temperature and Humidity Sensor 
-4. SGP30, CO2 and TVOC Sensor
+    1. D1 Mini board with esp8266 chip
+    2. SSD1306, 0.96 inch 128x64 pixels, 7 pin OLED Screen
+    3. DHT11, Temperature and Humidity Sensor 
+    4. SGP30, CO2 and TVOC Sensor
 
 ### Connection
 | D1 Mini Pin | ESP8266 Pin | SSD1306 | DHT11 | SGP30 |
@@ -29,12 +29,14 @@ IOT home environment monitor based on esp8266 and micropython
 
 
 ## Firmware
-MicroPython v1.13 2020-09-11; ESP module with ESP8266
+    MicroPython v1.13 2020-09-11;
+    ESP module with ESP8266
 
 ## Communication
-MQTT Protocal with Broker Emqx
-1. go to directory emqx\bin\ , open shell, run comand "emqx start"
-2. run command "emqx_ctl status" to check if node running
+### MQTT Protocal
+    1. download MQTT broker Emqx
+    2. go to directory emqx\bin\ , open shell, run comand "emqx start"
+    3. run command "emqx_ctl status" to check if node running
 
 ## Upper Monitor Gui
 ### runtime
