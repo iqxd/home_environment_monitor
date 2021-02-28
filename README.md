@@ -37,9 +37,13 @@ MQTT Protocal with Broker Emqx
 2. run command "emqx_ctl status" to check if node running
 
 ## Upper Monitor Gui
-Dear PyGui 0.6.139
-CPython 3.8
-1. run "python monitor_gui\mqtt_sub_gui.py"
+### runtime
+    CPython 3.8.0
+### additional packages
+    Dear PyGui 0.6.139
+    Paho-mqtt 1.5.1 
+### commands
+    run command "python monitor_gui\mqtt_sub_gui.py"
 
 ## Prototype
 ![avatar](https://user-images.githubusercontent.com/13008913/99083762-f3f97700-2600-11eb-96b4-054dbdca560f.jpg)
